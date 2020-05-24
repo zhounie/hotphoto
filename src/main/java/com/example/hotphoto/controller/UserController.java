@@ -1,6 +1,7 @@
 package com.example.hotphoto.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.example.hotphoto.dao.User;
 import com.example.hotphoto.service.UserService;
@@ -21,6 +22,7 @@ public class UserController {
 
     @PostMapping("/add")
     public int add (@RequestBody String jsonString) {
+        System.out.print(jsonString);
         JSONObject params = JSONObject.parseObject(jsonString);
         User user = new User();
         user.setUsername(params.getString("username"));
@@ -28,9 +30,16 @@ public class UserController {
         return userService.insertUser(user);
     }
 
-
     @PostMapping("/findAll")
     public List<User> findAll () {
         return userService.findAll();
+    }
+
+    @PostMapping("/findByUsername")
+    public User findByUsername(@RequestBody String jsonString) {
+        JSONObject params = JSONObject.parseObject(jsonString);
+        User user = new User();
+        user.setUsername(params.getString("username"));
+        return userService.findByUsername(user.getUsername());
     }
 }

@@ -15,4 +15,7 @@ public interface UserMapper {
 
     @Select("SELECT * FROM `user`")
     List<User> findAll();
+
+    @Select("SELECT * FROM `user` WHERE username=#{username}")
+    User findByUsername(User user);
 }
