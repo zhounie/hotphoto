@@ -31,10 +31,11 @@ public class LoginController {
     public HttpResult login(@RequestBody LoginBean loginBean, HttpServletRequest request) throws IOException {
         String username = loginBean.getUsername();
         String password = loginBean.getPassword();
+        System.out.print(username);
 
 //        系统登录认证
-//        JwtAuthenticatioToken token = SecurityUtils.login(request, username, password, authenticationManager);
+        JwtAuthenticatioToken token = SecurityUtils.login(request, username, password, authenticationManager);
 
-        return HttpResult.ok();
+        return HttpResult.ok(token);
     }
 }
