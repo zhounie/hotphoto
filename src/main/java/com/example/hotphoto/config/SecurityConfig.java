@@ -5,6 +5,7 @@ import com.example.hotphoto.security.JwtAuthenticationProvider;
 import com.example.hotphoto.security.JwtLoginFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -28,6 +29,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Qualifier("userDetailsServiceImpl")
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -40,19 +42,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 //        禁用disable，因为使用的是JWT，所以不需要csrf
-        http.cors().and().csrf().disable()
-                .authorizeRequests()
+        http.cors().and().csrf().disable().authorizeRequests()
                 // 忽略跨域预检请求
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // 忽略登录请求
-                .antMatchers("/login").permitAll()
+                // 首页和登录也 忽略登录请求
+                .antMatchers("/").permitAll().antMatchers("/login").permitAll()
+//                swagger
+                .antMatchers("/swagger-ui.html").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/v2/api-docs").permitAll()
+                .antMatchers("/webjars/springfox-swagger-ui/**").permitAll()
 //                其他所有请求需要身份认证
                 .anyRequest().authenticated();
+//        退出登录处理器
         http.logout().logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
 //        开启登录认证流程过滤器
         http.addFilterBefore(
-                new JwtLoginFilter(authenticationManager()),
-                UsernamePasswordAuthenticationFilter.class
+            new JwtLoginFilter(authenticationManager()),
+            UsernamePasswordAuthenticationFilter.class
         );
 //        访问控制时登录状态检查过滤器
         http.addFilterBefore(new JwtAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class);
@@ -60,7 +67,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/user/findAll").antMatchers("/login");
+        web.ignoring()
+                .antMatchers("/user/findAll")
+                .antMatchers("/user/findPage")
+                .antMatchers("/user/add")
+                .antMatchers("/login")
+                .antMatchers("/code");
     }
 
 

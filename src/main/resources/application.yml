@@ -11,3 +11,8 @@ spring:
         user:
             name: zoey
             password: 123
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql

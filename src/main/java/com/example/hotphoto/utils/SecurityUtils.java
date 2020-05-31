@@ -1,6 +1,6 @@
 package com.example.hotphoto.utils;
 
-import com.example.hotphoto.security.JwtAuthenticatioToken;
+import com.example.hotphoto.security.JwtAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,13 +9,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.servlet.http.HttpServletRequest;
 
 public class SecurityUtils {
-    public static JwtAuthenticatioToken login(
+    public static JwtAuthenticationToken login(
             HttpServletRequest request,
             String username,
             String password,
             AuthenticationManager authenticationManager
     ) {
-        JwtAuthenticatioToken token = new JwtAuthenticatioToken(username, password);
+        JwtAuthenticationToken token = new JwtAuthenticationToken(username, password);
         Authentication authentication = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         token.setToken(JwtTokenUtils.generateToken(authentication));

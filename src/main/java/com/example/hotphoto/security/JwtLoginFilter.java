@@ -47,7 +47,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
             password = "";
         }
         username = username.trim();
-        JwtAuthenticatioToken authRequest = new JwtAuthenticatioToken(username, password);
+        JwtAuthenticationToken authRequest = new JwtAuthenticationToken(username, password);
         setDetails(request, authRequest);
         return this.getAuthenticationManager().authenticate(authRequest);
     }
@@ -68,7 +68,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
             eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authResult, this.getClass()));
         }
 //        生成并返回token给客户端，后续访问携带此token
-        JwtAuthenticatioToken token = new JwtAuthenticatioToken(null, null, JwtTokenUtils.generateToken(authResult));
+        JwtAuthenticationToken token = new JwtAuthenticationToken(null, null, JwtTokenUtils.generateToken(authResult));
         HttpUtils.write(response, token);
     }
 

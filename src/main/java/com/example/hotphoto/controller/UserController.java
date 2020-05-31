@@ -3,8 +3,11 @@ package com.example.hotphoto.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.example.hotphoto.core.page.PageRequest;
 import com.example.hotphoto.dao.User;
 import com.example.hotphoto.service.UserService;
+import com.example.hotphoto.utils.PasswordUtils;
+import com.example.hotphoto.vo.HttpResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,13 +24,17 @@ public class UserController {
 //    @RequestParam String username, @RequestParam String password
 
     @PostMapping("/add")
-    public int add (@RequestBody String jsonString) {
-        System.out.print(jsonString);
-        JSONObject params = JSONObject.parseObject(jsonString);
-        User user = new User();
-        user.setUsername(params.getString("username"));
-        user.setPassword(params.getString("password"));
-        return userService.insertUser(user);
+    public HttpResult add (@RequestBody User user) {
+        if (user.getPassword() != null) {
+            String salt = PasswordUtils.getSalt();
+            if (userService.findByUsername(user.getUsername()) != null) {
+                return HttpResult.error("用户名已存在");
+            }
+            String password = PasswordUtils.encode(user.getPassword(), salt);
+            user.setSalt(salt);
+            user.setPassword(password);
+        }
+        return HttpResult.ok(userService.insertUser(user));
     }
 
     @PostMapping("/findAll")
@@ -41,5 +48,10 @@ public class UserController {
         User user = new User();
         user.setUsername(params.getString("username"));
         return userService.findByUsername(user.getUsername());
+    }
+
+    @PostMapping("/findPage")
+    public HttpResult findPage(@RequestBody PageRequest pageRequest) {
+        return HttpResult.ok(userService.findPage(pageRequest));
     }
 }

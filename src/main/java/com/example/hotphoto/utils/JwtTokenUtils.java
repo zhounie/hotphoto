@@ -1,11 +1,10 @@
 package com.example.hotphoto.utils;
 
 import com.example.hotphoto.security.GrantedAuthorityImpl;
-import com.example.hotphoto.security.JwtAuthenticatioToken;
+import com.example.hotphoto.security.JwtAuthenticationToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.apache.catalina.security.SecurityUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -38,7 +37,7 @@ public class JwtTokenUtils implements Serializable {
 
     private static String generateToken(Map<String, Object> claims) {
         Date expirationDate = new Date(System.currentTimeMillis() + EXPIRE_TIME);
-        return Jwts.builder().setClaims(claims).setExpiration(expirationDate).signWith(SignatureAlgorithm.ES512, SECRET).compact();
+        return Jwts.builder().setClaims(claims).setExpiration(expirationDate).signWith(SignatureAlgorithm.HS512, SECRET).compact();
     }
 
     public static String getUsernameFromToken(String token) {
@@ -52,6 +51,11 @@ public class JwtTokenUtils implements Serializable {
         return username;
     }
 
+    /**
+     * 根据请求令牌获取登录验证信息
+     * @param request
+     * @return
+     */
     public static Authentication getAuthenticationeFromToken(HttpServletRequest request) {
         Authentication authentication = null;
         String token = JwtTokenUtils.getToken(request);
@@ -75,7 +79,7 @@ public class JwtTokenUtils implements Serializable {
                         authorities.add(new GrantedAuthorityImpl((String) ((Map) object).get("authority")));
                     }
                 }
-                authentication = new JwtAuthenticatioToken(username, null, authorities, token);
+                authentication = new JwtAuthenticationToken(username, null, authorities, token);
             } else {
                 if (validateToken(token, SecurityUtils.getUsername())) {
 //                如果上下文中Authentication非空，并且请求令牌合法，直接返回当前登录认证信息
@@ -86,6 +90,11 @@ public class JwtTokenUtils implements Serializable {
         return authentication;
     }
 
+    /**
+     * 从令牌中获取数据声明
+     * @param token 令牌
+     * @return 数据声明
+     */
     private static Claims getClaimsFromToken(String token) {
         Claims claims;
         try {
@@ -104,8 +113,26 @@ public class JwtTokenUtils implements Serializable {
      */
     public static Boolean validateToken(String token, String username){
         String userName = getUsernameFromToken(token);
-        return (userName.equals(username) && isTokenExpired(token));
+        return (userName.equals(username) && !isTokenExpired(token));
     }
+
+    /**
+     * 刷新令牌
+     * @param token
+     * @return
+     */
+    public static String refreshToken(String token) {
+        String refreshToken;
+        try {
+            Claims claims = getClaimsFromToken(token);
+            claims.put(CREATED, new Date());
+            refreshToken = generateToken(claims);
+        } catch (Exception e) {
+            refreshToken = null;
+        }
+        return refreshToken;
+    }
+
 
     /**
      * 判断令牌是否过期

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper xmlns="http://mybatis.org/schema/mybatis-mapper" namespace="com.example.hotphoto.mapper.DictMapper">
+    <resultMap id="BaseResultMap" type="com.example.hotphoto.dao.Dict">
+        <id column="id" jdbcType="BIGINT" property="id"></id>
+        <result column="value" jdbcType="VARCHAR" property="value"></result>
+        <result column="label" jdbcType="VARCHAR" property="label"></result>
+        <result column="type" jdbcType="VARCHAR" property="type"></result>
+        <result column="description" jdbcType="VARCHAR" property="description"></result>
+        <result column="sort" jdbcType="DECIMAL" property="sort"></result>
+        <result column="createBy" jdbcType="VARCHAR" property="createBy"></result>
+        <result column="createTime" jdbcType="TIMESTAMP" property="createTime"></result>
+        <result column="lastUpdateBy" jdbcType="VARCHAR" property="lastUpdateBy"></result>
+        <result column="lastUpdateTime" jdbcType="TIMESTAMP" property="lastUpdateTime"></result>
+        <result column="remarks" jdbcType="VARCHAR" property="remarks"></result>
+        <result column="delFlag" jdbcType="TINYINT" property="delFlag"></result>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, value, label, type, description, sort, createBy, createTime, lastUpdateBy, lastUpdateTime, remarks, delFlag
+    </sql>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from dict
+        where id = #{id, jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" parameterType="com.example.hotphoto.dao.Dict">
+        insert into dict (id, value, label, type, description, sort, createBy, createTime, lastUpdateBy, lastUpdateTime, remarks, delFlag)
+        values (
+        #{id, jdbcType=BIGINT},
+        #{value, jdbcType=VARCHAR},
+        #{label, jdbcType=VARCHAR},
+        #{type, jdbcType=VARCHAR},
+        #{description, jdbcType=VARCHAR},
+        #{sort, jdbcType=DECIMAL},
+        #{createBy, jdbcType=VARCHAR},
+        #{createTime, jdbcType=TIMESTAMP},
+        #{lastUpdateBy, jdbcType=VARCHAR},
+        #{lastUpdateTime, jdbcType=TIMESTAMP},
+        #{remarks, jdbcType=VARCHAR},
+        #{delFlag, jdbcType=TINYINT}
+        )
+    </insert>
+</mapper>

@@ -26,7 +26,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("该用户不存在");
         }
         Set<String> permissions = userService.findPermissions(username);
-        List<GrantedAuthority> grantedAuthorities = permissions.stream().map(GrantedAuthorityImpl::new).collect(Collectors.toList());
-        return new JwtUserDetails(username, user.getPassword(), grantedAuthorities);
+        List<GrantedAuthority> grantedAuthorities = permissions
+                .stream()
+                .map(GrantedAuthorityImpl::new)
+                .collect(Collectors.toList());
+        return new JwtUserDetails(
+                username,
+                user.getPassword(),
+                user.getSalt(),
+                grantedAuthorities
+        );
     }
 }

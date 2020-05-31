@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mapper xmlns="http://mybatis.org/schema/mybatis-mapper" namespace="com.example.hotphoto.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.example.hotphoto.dao.User">
+        <id column="id" javaType="BIGINT" property="id" />
+        <result column="username" jdbcType="VARCHAR" property="username"></result>
+        <result column="password" jdbcType="VARCHAR" property="password"></result>
+    </resultMap>
+    <update id="updateByPrimaryKeySelective" parameterType="com.example.hotphoto.mapper.UserMapper">
+        update user
+        <set>
+            <if test="username != null">
+                username = #{username, jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password, jdbcType=VARCHAR}
+            </if>
+        </set>
+        where id = #{id, jdbcType=BIGINT}
+    </update>
+</mapper>
